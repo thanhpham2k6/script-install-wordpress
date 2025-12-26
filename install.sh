@@ -83,9 +83,11 @@ sed -i "s/username_here/$DB_USER/" wp-config.php
 sed -i "s/password_here/$DB_PASS/" wp-config.php
 
 # Generate unique salts
-SALTS=$(curl -s https://api.wordpress.org/secret-key/1.1/salt/)
+curl -s https://api.wordpress.org/secret-key/1.1/salt/ > /tmp/wp-salts.txt
+
+# Replace the salt section
 sed -i "/AUTH_KEY/,/NONCE_SALT/d" wp-config.php
-sed -i "/\$table_prefix/i\\$SALTS" wp-config.php
+sed -i "/^define( 'DB_COLLATE'/r /tmp/wp-salts.txt" wp-config.php
 
 # Configure Apache
 echo -e "${GREEN}[8/8] Configuring Apache...${NC}"
